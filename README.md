@@ -3,7 +3,7 @@ copy the Url :
 
 run command in shell :
 ```
-git clone 
+git clone https://github.com/kshitijkumrawat20/Academic_chatbot.git
 ```
 
 now after cloning 
