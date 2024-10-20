@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Interface</title>
+    <style>
+        /* CSS styles */
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        #chat-container {
+            height: 400px;
+            border: 1px solid #ccc;
+            overflow-y: scroll;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        #user-input {
+            width: 70%;
+            padding: 5px;
+        }
+        #send-btn {
+            width: 25%;
+            padding: 5px;
+        }
+        .hidden {
+            display: none;
+        }
+        #faculty-options, #student-options {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        input, button, select, textarea {
+            margin: 5px 0;
+            width: 100%;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <h1>Chatbot Interface</h1>
+    <select id="role-select">
+        <option value="student">Student</option>
+        <option value="faculty">Faculty</option>
+    </select>
+    <div id="chat-container"></div>
+    <input type="text" id="user-input" placeholder="Type your message here...">
+    <button id="send-btn">Send</button>
+
+    <div id="faculty-options" class="hidden">
+        <h2>Faculty Options</h2>
+        <button id="add-assignment-btn">Add Assignment</button>
+        <button id="update-attendance-btn">Update Attendance</button>
+        <div id="assignment-form" class="hidden">
+            <select id="assignment-subject">
+                <option value="Internet and Web Technology">Internet and Web Technology</option>
+                <option value="Theory of Computation">Theory of Computation</option>
+                <option value="Cybersecurity">Cybersecurity</option>
+                <option value="DBMS">DBMS</option>
+            </select>
+            <input type="date" id="assignment-deadline" placeholder="Deadline">
+            <textarea id="assignment-question" placeholder="Question"></textarea>
+            <input type="text" id="assignment-professor" placeholder="Professor"> 
+            <button id="submit-assignment-btn">Submit Assignment</button>
+        </div>
+        <div id="attendance-form" class="hidden">
+            <select id="student-id"> 
+                </select>
+            <select id="attendance-subject">
+                <option value="iwt_attendance">Internet and Web Technology</option>
+                <option value="toc_attendance">Theory of Computation</option>
+                <option value="cybersecurity_attendance">Cybersecurity</option>
+                <option value="dbms_attendance">DBMS</option>
+            </select>
+            <input type="number" id="attendance-value" min="0" max="100" placeholder="Attendance (0-100)">
+            <button id="submit-attendance-btn">Submit Attendance</button>
+        </div>
+    </div>
+
+    <div id="student-options" class="hidden">
+        <h2>Student Options</h2>
+        <button id="check-assignments-btn">Check Assignments</button>
+    </div>
+
+    <script>
+        // JavaScript code
+        const chatContainer = document.getElementById('chat-container');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+        const roleSelect = document.getElementById('role-select');
+        const facultyOptions = document.getElementById('faculty-options');
+        const studentOptions = document.getElementById('student-options');
+        const addAssignmentBtn = document.getElementById('add-assignment-btn');
+        const updateAttendanceBtn = document.getElementById('update-attendance-btn');
+        const assignmentForm = document.getElementById('assignment-form');
+        const attendanceForm = document.getElementById('attendance-form');
+        const submitAssignmentBtn = document.getElementById('submit-assignment-btn');
+        const submitAttendanceBtn = document.getElementById('submit-attendance-btn');
+        const checkAssignmentsBtn = document.getElementById('check-assignments-btn');
+        const assignmentProfessorInput = document.getElementById('assignment-professor'); 
+
+    
+        function appendMessage(sender, message) {
+            const messageElement = document.createElement('p');
+            messageElement.innerHTML = `<strong>${sender}:</strong> ${message}`;
+            chatContainer.appendChild(messageElement);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+    
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            const role = roleSelect.value;
+    
+            if (message) {
+                appendMessage('You', message);
+                userInput.value = '';
+    
+                try {
+                    const response = await fetch('/chat', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            role: role,
+                            message: message
+                        }),
+                    });
+    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+    
+                    const data = await response.json();
+                    appendMessage('Chatbot', data.response);
+                } catch (error) {
+                    console.error('Error:', error);
+                    appendMessage('Chatbot', 'Sorry, an error occurred while processing your request.');
+                }
+            }
+        }
+
+        async function fetchStudents() {
+            try {
+                const response = await fetch('/get_students'); // Create this endpoint in FastAPI
+                const data = await response.json();
+
+                if (data.error) {
+                    console.error('Error fetching students:', data.error);
+                    return;
+                }
+
+                const students = data.students;
+                populateStudentDropdown('student-id', students);
+            } catch (error) {
+                console.error('Error fetching students:', error);
+            }
+        }
+
+        function populateStudentDropdown(dropdownId, students) {
+            const dropdown = document.getElementById(dropdownId);
+            let optionsHTML = '';
+            students.forEach(student => {
+                optionsHTML += `<option value="${student.id}">${student.name}</option>`; // Assuming your students table has 'id' and 'name' columns
+            });
+            dropdown.innerHTML = optionsHTML;
+        }
+    
+        async function addAssignment() {
+            const subject = document.getElementById('assignment-subject').value;
+            const deadline = document.getElementById('assignment-deadline').value;
+            const question = document.getElementById('assignment-question').value;
+            const professor = assignmentProfessorInput.value; 
+
+    
+            try {
+                const response = await fetch('/add_assignment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        subject: subject,
+                        deadline: deadline,
+                        question: question,
+                        professor: professor 
+                    }),
+                });
+    
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+    
+                const data = await response.json();
+                appendMessage('System', data.response);
+            } catch (error) {
+                console.error('Error:', error);
+                appendMessage('System', 'Sorry, an error occurred while adding the assignment.');
+            }
+        }
+    
+        async function updateAttendance() {
+            const studentId = document.getElementById('student-id').value;
+            const subject = document.getElementById('attendance-subject').value;
+            const attendance = document.getElementById('attendance-value').value;
+    
+            try {
+                const response = await fetch('/update_attendance', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        student_id: studentId,
+                        subject: subject,
+                        attendance: attendance
+                    }),
+                });
+    
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+    
+                const data = await response.json();
+                appendMessage('System', data.response);
+            } catch (error) {
+                console.error('Error:', error);
+                appendMessage('System', 'Sorry, an error occurred while updating attendance.');
+            }
+        }
+    
+        async function checkAssignments() {
+            try {
+                const response = await fetch('/get_assignments');
+    
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+    
+                const data = await response.json();
+                let message = 'Assignments:\n';
+                data.assignments.forEach(assignment => {
+                    message += `Subject: ${assignment.subject}, Deadline: ${assignment.deadline}, Question: ${assignment.question}, Professor: ${assignment.professor}\n`;
+                });
+                appendMessage('System', message);
+            } catch (error) {
+                console.error('Error:', error);
+                appendMessage('System', 'Sorry, an error occurred while fetching assignments.');
+            }
+        }
+    
+        roleSelect.addEventListener('change', () => {
+            if (roleSelect.value === 'faculty') {
+                facultyOptions.classList.remove('hidden');
+                studentOptions.classList.add('hidden');
+            } else {
+                facultyOptions.classList.add('hidden');
+                studentOptions.classList.remove('hidden');
+            }
+        });
+    
+        sendBtn.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    
+        addAssignmentBtn.addEventListener('click', () => {
+            assignmentForm.classList.toggle('hidden');
+            attendanceForm.classList.add('hidden');
+        });
+    
+        updateAttendanceBtn.addEventListener('click', () => {
+            attendanceForm.classList.toggle('hidden');
+            assignmentForm.classList.add('hidden');
+        });
+    
+        submitAssignmentBtn.addEventListener('click', addAssignment);
+        submitAttendanceBtn.addEventListener('click', updateAttendance);
+        checkAssignmentsBtn.addEventListener('click', checkAssignments);
+
+
+        // Fetch students when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchStudents();
+            // ... other initialization logic ...
+        });
+    </script>
+    
+</body>
+</html>
