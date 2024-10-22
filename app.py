@@ -1,38 +1,42 @@
-import sqlite3
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from fastapi.middleware.cors import CORSMiddleware  # Import CORS Middleware
 from pydantic import BaseModel
+import sqlite3
+from pathlib import Path
+from sqlalchemy import create_engine
 from langchain_community.agent_toolkits.sql.base import create_sql_agent
 from langchain_community.utilities.sql_database import SQLDatabase
-from langchain_groq import ChatGroq
-from sqlalchemy import create_engine
-from pathlib import Path
 from langchain_community.agent_toolkits.sql.toolkit import SQLDatabaseToolkit
+from langchain_groq import ChatGroq
 from langchain_core.prompts import PromptTemplate
 
 # Initialize FastAPI app
 app = FastAPI()
 
+# Add CORS Middleware to allow cross-origin requests
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Adjust this for specific domains in production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Setup SQLite database connection via LangChain
 db_path = (Path("database.db")).absolute()
-print(db_path)
 engine = create_engine(f"sqlite:///{db_path}")
 
 # Create SQLDatabase instance
 db = SQLDatabase(engine)
-# Define your API key for ChatGroq
-api_key = "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"  # Replace with your actual API key
+api_key = "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"
 llm = ChatGroq(api_key=api_key, model_name="llama-3.1-70b-versatile", streaming=True)
 toolkit = SQLDatabaseToolkit(db=db, llm=llm)
-# Initialize LangChain agent with ChatGroq
-agent = create_sql_agent(
-    llm=llm,
-    toolkit=toolkit,
-    verbose=True
-)
-well_spaced_prompt = PromptTemplate.from_template("Please format the following response in a well-spaced manner:\n\n{response}")
+
+# Initialize LangChain agent
+agent = create_sql_agent(llm=llm, toolkit=toolkit, verbose=True)
 
 # Set up Jinja2 templates
 templates = Jinja2Templates(directory="templates")
@@ -58,7 +62,6 @@ async def read_root(request: Request):
 
 @app.post("/chat")
 async def chat(request: ChatRequest):
-    """Handle user queries using the agent."""
     try:
         result = agent.run(request.message)
         return {"response": result}
@@ -101,7 +104,6 @@ async def update_attendance(request: AttendanceRequest):
     try:
         conn = sqlite3.connect("database.db")
         cursor = conn.cursor()
-        # Assuming attendance is stored as a percentage in the database
         cursor.execute(
             f"UPDATE students SET {request.subject} = ? WHERE id = ?",
             (request.attendance, request.student_id)
@@ -116,11 +118,10 @@ async def update_attendance(request: AttendanceRequest):
 
 @app.get("/get_students")
 async def get_students():
-    """Fetches a list of students from the database."""
     try:
         conn = sqlite3.connect("database.db")
         cursor = conn.cursor()
-        cursor.execute("SELECT id, name FROM students") # Assuming you have 'id' and 'name' columns 
+        cursor.execute("SELECT id, name FROM students")
         students = [{"id": row[0], "name": row[1]} for row in cursor.fetchall()]
         conn.close()
         return {"students": students}
@@ -128,5 +129,3 @@ async def get_students():
         return {"error": f"Database error: {str(e)}"}
     except Exception as e:
         return {"error": f"Error: {str(e)}"}
-# Mount the static directory
-# app.mount("/static", StaticFiles(directory="static"), name="static")
