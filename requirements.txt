@@ -1,7 +1,6 @@
 fastapi
 pydantic
 jinja2
-sqlite
 langchain
 langchain-core
 langchain-community
