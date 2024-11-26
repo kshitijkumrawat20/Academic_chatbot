@@ -129,3 +129,126 @@ async def get_students():
         return {"error": f"Database error: {str(e)}"}
     except Exception as e:
         return {"error": f"Error: {str(e)}"}
+    
+    
+# Add these new endpoints to app.py
+
+@app.post("/add_student")
+async def add_student(student: dict):
+    try:
+        conn = sqlite3.connect("database.db")
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT INTO students (name, iwt_attendance, toc_attendance, cybersecurity_attendance, 
+            dbms_attendance, iwt_marks, toc_marks, cybersecurity_marks, dbms_marks)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (student['name'], 0, 0, 0, 0, 0, 0, 0, 0))
+        conn.commit()
+        conn.close()
+        return JSONResponse(content={"response": "Student added successfully."})
+    except sqlite3.Error as e:
+        return JSONResponse(content={"response": f"Database error: {str(e)}"})
+
+@app.delete("/remove_student/{student_id}")
+async def remove_student(student_id: int):
+    try:
+        conn = sqlite3.connect("database.db")
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM students WHERE id = ?", (student_id,))
+        conn.commit()
+        conn.close()
+        return JSONResponse(content={"response": "Student removed successfully."})
+    except sqlite3.Error as e:
+        return JSONResponse(content={"response": f"Database error: {str(e)}"})
+
+@app.post("/add_notice")
+async def add_notice(notice: dict):
+    try:
+        conn = sqlite3.connect("database.db")
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO announcements (subject, professor, announcement, date) VALUES (?, ?, ?, ?)",
+            (notice['subject'], notice['professor'], notice['announcement'], notice['date'])
+        )
+        conn.commit()
+        conn.close()
+        return JSONResponse(content={"response": "Notice added successfully."})
+    except sqlite3.Error as e:
+        return JSONResponse(content={"response": f"Database error: {str(e)}"})
+
+@app.get("/get_assignments_by_subject/{subject}")
+async def get_assignments_by_subject(subject: str):
+    try:
+        conn = sqlite3.connect("database.db")
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT id, subject, deadline, question, professor FROM assignments WHERE subject = ?",
+            (subject,)
+        )
+        assignments = cursor.fetchall()
+        conn.close()
+        return {
+            "assignments": [
+                {
+                    "id": a[0],
+                    "subject": a[1],
+                    "deadline": a[2],
+                    "question": a[3],
+                    "professor": a[4]
+                } for a in assignments
+            ]
+        }
+    except sqlite3.Error as e:
+        return {"response": f"Database error: {str(e)}"}
+# ... (previous code remains unchanged)
+
+@app.get("/get_notices")
+async def get_notices():
+    try:
+        conn = sqlite3.connect("database.db")
+        cursor = conn.cursor()
+        cursor.execute("SELECT subject, professor, announcement, date FROM announcements")
+        notices = cursor.fetchall()
+        conn.close()
+        return {
+            "notices": [
+                {
+                    "subject": n[0],
+                    "professor": n[1],
+                    "announcement": n[2],
+                    "date": n[3]
+                } for n in notices
+            ]
+        }
+    except sqlite3.Error as e:
+        return {"error": f"Database error: {str(e)}"}
+    except Exception as e:
+        return {"error": f"Error: {str(e)}"}
+
+@app.get("/get_notices_by_subject/{subject}")
+async def get_notices_by_subject(subject: str):
+    try:
+        conn = sqlite3.connect("database.db")
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT subject, professor, announcement, date FROM announcements WHERE subject = ?",
+            (subject,)
+        )
+        notices = cursor.fetchall()
+        conn.close()
+        return {
+            "notices": [
+                {
+                    "subject": n[0],
+                    "professor": n[1],
+                    "announcement": n[2],
+                    "date": n[3]
+                } for n in notices
+            ]
+        }
+    except sqlite3.Error as e:
+        return {"error": f"Database error: {str(e)}"}
+    except Exception as e:
+        return {"error": f"Error: {str(e)}"}
+
+
