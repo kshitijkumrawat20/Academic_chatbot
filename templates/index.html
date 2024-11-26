@@ -79,14 +79,27 @@
         .info-box {
             flex-grow: 1;
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: flex-start;
             padding: 2rem;
+            gap: 2rem;
         }
 
         .info-box-main {
-            width: 100%;
+            width: 60%;
             max-width: 800px;
+        }
+
+        .options-container {
+            width: 35%;
+            margin-top: 0;
+            position: sticky;
+            top: 2rem;
+            max-height: calc(100vh - 4rem);
+            overflow-y: auto;
+            background-color: rgba(27, 48, 88, 0.1);
+            border-radius: 0.5rem;
+            padding: 1rem;
         }
 
         h1 {
@@ -155,13 +168,6 @@
 
         #send-btn:hover {
             background-color: var(--primary-dark);
-        }
-
-        .options-container {
-            margin-top: 2rem;
-            background-color: rgba(27, 48, 88, 0.1);
-            border-radius: 0.5rem;
-            padding: 1rem;
         }
 
         .options-container h2 {
@@ -287,6 +293,15 @@
             .footer-section {
                 flex: 0 0 100%;
             }
+
+            .info-box {
+                flex-direction: column;
+            }
+
+            .info-box-main,
+            .options-container {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -319,11 +334,17 @@
                 <div id="chat-container"></div>
                 <input type="text" id="user-input" placeholder="Type your message here...">
                 <button id="send-btn">Send</button>
-            
-                <div id="faculty-options" class="options-container hidden">
+            </div>
+
+            <div class="options-container">
+                <div id="faculty-options" class="hidden">
                     <h2>Faculty Options</h2>
                     <button id="add-assignment-btn">Add Assignment</button>
                     <button id="update-attendance-btn">Update Attendance</button>
+                    <button id="add-student-btn">Add Student</button>
+                    <button id="remove-student-btn">Remove Student</button>
+                    <button id="add-notice-btn">Add Notice</button>
+                    
                     <div id="assignment-form" class="hidden">
                         <div class="form-group">
                             <select id="assignment-subject">
@@ -344,6 +365,7 @@
                         </div>
                         <button id="submit-assignment-btn">Submit Assignment</button>
                     </div>
+                    
                     <div id="attendance-form" class="hidden">
                         <div class="form-group">
                             <select id="student-id"></select>
@@ -361,11 +383,53 @@
                         </div>
                         <button id="submit-attendance-btn">Submit Attendance</button>
                     </div>
+                    
+                    <div id="add-student-form" class="hidden">
+                        <div class="form-group">
+                            <input type="text" id="new-student-name" placeholder="Student Name">
+                        </div>
+                        <button id="confirm-add-student-btn">Add Student</button>
+                    </div>
+
+                    <div id="remove-student-form" class="hidden">
+                        <div class="form-group">
+                            <select id="remove-student-select"></select>
+                        </div>
+                        <button id="confirm-remove-student-btn">Remove Student</button>
+                    </div>
+
+                    <div id="add-notice-form" class="hidden">
+                        <div class="form-group">
+                            <select id="notice-subject">
+                                <option value="Internet and Web Technology">Internet and Web Technology</option>
+                                <option value="Theory of Computation">Theory of Computation</option>
+                                <option value="Cybersecurity">Cybersecurity</option>
+                                <option value="DBMS">DBMS</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="notice-professor" placeholder="Professor Name">
+                        </div>
+                        <div class="form-group">
+                            <textarea id="notice-text" placeholder="Notice Content"></textarea>
+                        </div>
+                        <button id="confirm-add-notice-btn">Add Notice</button>
+                    </div>
                 </div>
             
-                <div id="student-options" class="options-container hidden">
+                <div id="student-options" class="hidden">
                     <h2>Student Options</h2>
+                    <div class="form-group">
+                        <select id="subject-filter">
+                            <option value="">Select Subject</option>
+                            <option value="Internet and Web Technology">Internet and Web Technology</option>
+                            <option value="Theory of Computation">Theory of Computation</option>
+                            <option value="Cybersecurity">Cybersecurity</option>
+                            <option value="DBMS">DBMS</option>
+                        </select>
+                    </div>
                     <button id="check-assignments-btn">Check Assignments</button>
+                    <button id="get-notices-btn">Get Notices</button>
                 </div>
             </div>
         </div>
@@ -374,7 +438,7 @@
             <div class="footer-content">
                 <div class="footer-section">
                     <h3>JIT-Borawan</h3>
-                    <p>JAWAHARLAL NEHRU CHARITABLE EDUCATIONAL TRUST, BORAWAN was founded in 1996 under the Trust Registration Act with the registration no.1/95-96 dated 13-06-1996 by Late Shri Subhash Ji Yadav a man with the vision to serve the community at large.</p>
+                    <p>JAWAHARLAL NEHRU CHARITABLE EDUCATIONAL TRUST, BORAWAN was founded in 1996...</p>
                     <div class="icon">
                         <i class="fa-brands fa-linkedin"></i>
                         <i class="fa-brands fa-x-twitter"></i>
@@ -387,34 +451,25 @@
                     <ul>
                         <li><i class="fa-solid fa-phone"></i> +91 7285-277-812</li>
                         <li><i class="fa-solid fa-envelope"></i> principal@jitechno.com</li>
-                        <li><i class="fa-solid fa-envelope"></i> principal_jit@rediffmail.com</li>
                     </ul>
                 </div>
                 <div class="footer-section">
                     <h3>Faculty</h3>
                     <ul>
                         <li><a href="#">Faculty Directory</a></li>
-                        <li><a href="#">Faculty Development Schemes</a></li>
-                        <li><a href="#">Faculty Awards / Achievements</a></li>
-                        <li><a href="#">Faculty Handbook</a></li>
-                        <li><a href="#">Faculty Portals</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
                     <h3>Library</h3>
                     <ul>
-                        <li><a href="#">Library Information</a></li>
-                        <li><a href="#">Library Statistics</a></li>
                         <li><a href="#">Library Resources</a></li>
-                        <li><a href="#">Search for Books (OPAC)</a></li>
-                        <li><a href="#">Book Article Requisition Form</a></li>
                     </ul>
                 </div>
             </div>
         </div>
     </div>
 
-    <script>// JavaScript code
+    <script>
         const chatContainer = document.getElementById('chat-container');
         const userInput = document.getElementById('user-input');
         const sendBtn = document.getElementById('send-btn');
@@ -428,9 +483,13 @@
         const submitAssignmentBtn = document.getElementById('submit-assignment-btn');
         const submitAttendanceBtn = document.getElementById('submit-attendance-btn');
         const checkAssignmentsBtn = document.getElementById('check-assignments-btn');
-        const assignmentProfessorInput = document.getElementById('assignment-professor'); 
+        const assignmentProfessorInput = document.getElementById('assignment-professor');
         
-        
+        const addStudentBtn = document.getElementById('add-student-btn');
+        const removeStudentBtn = document.getElementById('remove-student-btn');
+        const addNoticeBtn = document.getElementById('add-notice-btn');
+        const subjectFilter = document.getElementById('subject-filter');
+
         function appendMessage(sender, message) {
             const messageElement = document.createElement('p');
             messageElement.innerHTML = `<strong>${sender}:</strong> ${message}`;
@@ -449,40 +508,43 @@
                 try {
                     const response = await fetch('/chat', {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            role: role,
-                            message: message
-                        }),
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ role, message }),
                     });
-        
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-        
+
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                     const data = await response.json();
                     appendMessage('Chatbot', data.response);
                 } catch (error) {
                     console.error('Error:', error);
-                    appendMessage('Chatbot', 'Sorry, an error occurred while processing your request.');
+                    appendMessage('Chatbot', 'Sorry, an error occurred while processing.');
                 }
             }
+        }
+        function closeAllForms() {
+            const forms = [
+                'assignment-form',
+                'attendance-form',
+                'add-student-form',
+                'remove-student-form',
+                'add-notice-form'
+            ];
+            forms.forEach(formId => {
+                document.getElementById(formId).classList.add('hidden');
+            });
         }
         
         async function fetchStudents() {
             try {
-                const response = await fetch('/get_students'); // Create this endpoint in FastAPI
+                const response = await fetch('/get_students');
                 const data = await response.json();
-        
                 if (data.error) {
                     console.error('Error fetching students:', data.error);
                     return;
                 }
-        
                 const students = data.students;
                 populateStudentDropdown('student-id', students);
+                populateStudentDropdown('remove-student-select', students);
             } catch (error) {
                 console.error('Error fetching students:', error);
             }
@@ -490,43 +552,28 @@
         
         function populateStudentDropdown(dropdownId, students) {
             const dropdown = document.getElementById(dropdownId);
-            let optionsHTML = '';
-            students.forEach(student => {
-                optionsHTML += `<option value="${student.id}">${student.name}</option>`; // Assuming your students table has 'id' and 'name' columns
-            });
-            dropdown.innerHTML = optionsHTML;
+            dropdown.innerHTML = students.map(student => `<option value="${student.id}">${student.name}</option>`).join('');
         }
         
         async function addAssignment() {
             const subject = document.getElementById('assignment-subject').value;
             const deadline = document.getElementById('assignment-deadline').value;
             const question = document.getElementById('assignment-question').value;
-            const professor = assignmentProfessorInput.value; 
-        
+            const professor = assignmentProfessorInput.value;
         
             try {
                 const response = await fetch('/add_assignment', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        subject: subject,
-                        deadline: deadline,
-                        question: question,
-                        professor: professor 
-                    }),
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ subject, deadline, question, professor }),
                 });
-        
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-        
+
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
                 appendMessage('System', data.response);
             } catch (error) {
                 console.error('Error:', error);
-                appendMessage('System', 'Sorry, an error occurred while adding the assignment.');
+                appendMessage('System', 'Error adding assignment.');
             }
         }
         
@@ -538,87 +585,153 @@
             try {
                 const response = await fetch('/update_attendance', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        student_id: studentId,
-                        subject: subject,
-                        attendance: attendance
-                    }),
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ student_id: studentId, subject, attendance }),
                 });
-        
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-        
+
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
                 appendMessage('System', data.response);
             } catch (error) {
                 console.error('Error:', error);
-                appendMessage('System', 'Sorry, an error occurred while updating attendance.');
+                appendMessage('System', 'Error updating attendance.');
             }
         }
         
-        async function checkAssignments() {
+        async function addStudent() {
+            const studentName = document.getElementById('new-student-name').value;
             try {
-                const response = await fetch('/get_assignments');
-        
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-        
+                const response = await fetch('/add_student', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: studentName }),
+                });
                 const data = await response.json();
-                let message = 'Assignments:\n';
-                data.assignments.forEach(assignment => {
-                    message += `Subject: ${assignment.subject}, Deadline: ${assignment.deadline}, Question: ${assignment.question}, Professor: ${assignment.professor}\n`;
+                appendMessage('System', data.response);
+                fetchStudents();
+            } catch (error) {
+                console.error('Error:', error);
+                appendMessage('System', 'Error adding student');
+            }
+        }
+        
+        async function removeStudent() {
+            const studentId = document.getElementById('remove-student-select').value;
+            try {
+                const response = await fetch(`/remove_student/${studentId}`, { method: 'DELETE' });
+                const data = await response.json();
+                appendMessage('System', data.response);
+                fetchStudents();
+            } catch (error) {
+                console.error('Error:', error);
+                appendMessage('System', 'Error removing student');
+            }
+        }
+        
+        async function addNotice() {
+            const notice = {
+                subject: document.getElementById('notice-subject').value,
+                professor: document.getElementById('notice-professor').value,
+                announcement: document.getElementById('notice-text').value,
+                date: new Date().toISOString().split('T')[0],
+            };
+            try {
+                const response = await fetch('/add_notice', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(notice),
+                });
+                const data = await response.json();
+                appendMessage('System', data.response);
+            } catch (error) {
+                console.error('Error:', error);
+                appendMessage('System', 'Error adding notice');
+            }
+        }
+        async function getNotices() {
+            const subject = subjectFilter.value;
+            try {
+                const endpoint = subject ? `/get_notices_by_subject/${subject}` : '/get_notices';
+                const response = await fetch(endpoint);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const data = await response.json();
+                if (data.error) throw new Error(data.error);
+                let message = data.notices.length ? 'Notices:\n' : 'No notices found.\n';
+                data.notices.forEach(n => {
+                    message += `Subject: ${n.subject}, Date: ${n.date}, Professor: ${n.professor}\nAnnouncement: ${n.announcement}\n\n`;
                 });
                 appendMessage('System', message);
             } catch (error) {
                 console.error('Error:', error);
-                appendMessage('System', 'Sorry, an error occurred while fetching assignments.');
+                appendMessage('System', `Error fetching notices: ${error.message}`);
             }
         }
         
-        roleSelect.addEventListener('change', () => {
-            if (roleSelect.value === 'faculty') {
-                facultyOptions.classList.remove('hidden');
-                studentOptions.classList.add('hidden');
-            } else {
-                facultyOptions.classList.add('hidden');
-                studentOptions.classList.remove('hidden');
+        async function checkAssignments() {
+            const subject = subjectFilter.value;
+            try {
+                const endpoint = subject ? `/get_assignments_by_subject/${subject}` : '/get_assignments';
+                const response = await fetch(endpoint);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const data = await response.json();
+                let message = data.assignments.length ? 'Assignments:\n' : 'No assignments found.\n';
+                data.assignments.forEach(a => {
+                    message += `Subject: ${a.subject}, Deadline: ${a.deadline}, Question: ${a.question}, Professor: ${a.professor}\n`;
+                });
+                appendMessage('System', message);
+            } catch (error) {
+                console.error('Error:', error);
+                appendMessage('System', 'Error fetching assignments.');
             }
-        });
+        }
         
+        document.getElementById('confirm-add-student-btn').addEventListener('click', addStudent);
+        document.getElementById('confirm-remove-student-btn').addEventListener('click', removeStudent);
+        document.getElementById('confirm-add-notice-btn').addEventListener('click', addNotice);
+        document.getElementById('get-notices-btn').addEventListener('click', getNotices);
+
+        subjectFilter.addEventListener('change', checkAssignments);
+        checkAssignmentsBtn.addEventListener('click', checkAssignments);
         sendBtn.addEventListener('click', sendMessage);
-        userInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
+        userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+        roleSelect.addEventListener('change', () => {
+            facultyOptions.classList.toggle('hidden', roleSelect.value !== 'faculty');
+            studentOptions.classList.toggle('hidden', roleSelect.value !== 'student');
         });
-        
         addAssignmentBtn.addEventListener('click', () => {
+            closeAllForms();
             assignmentForm.classList.toggle('hidden');
-            attendanceForm.classList.add('hidden');
         });
         
         updateAttendanceBtn.addEventListener('click', () => {
+            closeAllForms();
             attendanceForm.classList.toggle('hidden');
-            assignmentForm.classList.add('hidden');
+        });
+        
+        addStudentBtn.addEventListener('click', () => {
+            closeAllForms();
+            document.getElementById('add-student-form').classList.toggle('hidden');
+        });
+        
+        removeStudentBtn.addEventListener('click', () => {
+            closeAllForms();
+            document.getElementById('remove-student-form').classList.toggle('hidden');
+        });
+        
+        addNoticeBtn.addEventListener('click', () => {
+            closeAllForms();
+            document.getElementById('add-notice-form').classList.toggle('hidden');
         });
         
         submitAssignmentBtn.addEventListener('click', addAssignment);
         submitAttendanceBtn.addEventListener('click', updateAttendance);
-        checkAssignmentsBtn.addEventListener('click', checkAssignments);
         
-        
-        // Fetch students when the page loads
-        document.addEventListener('DOMContentLoaded', () => {
-            fetchStudents();
-            // ... other initialization logic ...
-        });
-        </script>
-</div>
-    
+        // Fetch students on page load
+        document.addEventListener('DOMContentLoaded', fetchStudents);
+
+        // Initialize the correct options panel based on the default role
+        roleSelect.dispatchEvent(new Event('change'));
+    </script>
 </body>
 </html>
+
